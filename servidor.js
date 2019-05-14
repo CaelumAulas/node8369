@@ -1,22 +1,14 @@
-const http = require("http")
+const express = require("express")
 
 // Request listener
-const servidor = http.createServer(function responde(request, resposta) {
-    if(request.url == "/produtos"){
-        resposta.end("Produtos")
-    }
-    else if(request.url == "/") {
-        resposta.end("Home")
-    }
-
-    resposta.end("404")
-})
+const servidor = express()
 
 // Assíncrono
 // Listener
 // Função de callback
 // Handler
+// Função anônima
 servidor.listen(3000, function(){
-    console.log("Servidor rodando na porta " + servidor.address().port)
+    console.log("Servidor rodando na porta " + servidor.port)
 })
 
