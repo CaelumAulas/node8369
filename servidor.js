@@ -26,6 +26,14 @@ servidor.get("/produtos", function respondeProdutos(request, resposta) {
     resposta.render("produtos/lista.ejs", {livros: listaDoBanco})
 })
 
+servidor.use(express.static('./static'))
+
+servidor.use(function responde404(request, resposta) {
+    resposta
+        .status(404)
+        .render("erros/erro.ejs", {erro: "404 - Página não encontrada"})
+})
+
 // Assíncrono
 // Listener
 // Função de callback
