@@ -1,0 +1,62 @@
+<% include ../includes/header.ejs %>
+
+    <!-- FINAL NAV -->
+    <div>
+        <div class ="container min-container">
+            <h2 class="basic-title">Listagem de livros</h2>
+            <div class="well">
+                <table class="table table-condensed table-bordered table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <td><a href="">Título</a></td>
+                        <td><a href="">Preço</a></td>
+                        <td><a href="">Descrição</a></td>
+                        <td><a href="">Nova Promoção</a></td>
+                    </tr>
+                    </thead>
+                    <tbody>                   
+                      <% livros.forEach(function(livro) { %>
+                        <tr>
+                            <td><%= livro.titulo %></td>
+                            <td><%= livro.preco %></td>
+                            <td><p><%= livro.descricao %></p></td>
+                            <td>
+                                <form action="/promocoes" method="post" style="margin: 0" class="form-promocao">
+                                    <input type="hidden" value="<%= livro.titulo %>">
+                                    <div class="input-group">
+                                        <input class="form-control"type="text" name="msg">
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-primary" type="submit">Ok</button>
+                                        </div>
+                                    </div>
+                                </form><!--
+                            --></td>
+                        </tr>
+                      <% }) %>
+                    </tbody>
+                </table>
+                <a href="/produtos/form" class="btn btn-success"><span class="glyphicon glyphicon-plus-sign"></span> Novo livro</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var formsPromocao = document.querySelectorAll(".form-promocao")
+        formsPromocao.forEach(function(form){
+            form.addEventListener("submit", function(event){
+                event.preventDefault()
+                fetch("/promocoes", {
+                    method: "POST"
+                    ,body: new FormData(form)
+                })
+                .then(function(result){
+                    console.log("Promoção enviada pro servidor")
+                })
+                .catch(function(error){
+                    console.error(error)
+                })
+            })
+        })
+    </script>
+
+<% include ../includes/footer.ejs %>

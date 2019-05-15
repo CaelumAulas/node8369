@@ -6,11 +6,24 @@ const servidor = express()
 const porta = process.env.PORTA || 3000
 
 servidor.get("/", function respondeHome(request, resposta) {
-    resposta.end("Home")
+    resposta.render("home/home.ejs")
 })
 
 servidor.get("/produtos", function respondeProdutos(request, resposta) {
-    resposta.end("Produtos")
+    const listaDoBanco = [
+        {
+            titulo: "Android"
+            ,preco: 50
+            ,descricao: "Livro teste"
+        }
+        ,        {
+            titulo: "Node"
+            ,preco: 33
+            ,descricao: "Livro teste"
+        }
+    ]
+
+    resposta.render("produtos/lista.ejs", {livros: listaDoBanco})
 })
 
 // Assíncrono
