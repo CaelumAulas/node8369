@@ -1,22 +1,25 @@
 const mysql = require("mysql")
 
 module.exports = function (servidor) {
-    servidor.get("/produtos", function respondeProdutos(request, resposta) {
     
+    servidor.get("/produtos", function respondeProdutos(request, resposta, next) {
         const conexao =  mysql.createConnection({
-            host: "tcp://0.tcp.ngrok.io",
+            host: "localhost",
             user: "root",
             password: "",
             database: "cdc",
-            port: 18195
+            port: 32769
         })
 
-       conexao.query("SELECT * FROM livros", function respostaBanco(erro, resultado) {
-        console.log(resultado)
-        resposta.render("produtos/lista", {livros: resultado})
-        
-        conexao.end()
-       })
+        conexao.query("SELECT * FROM livros", function respostaBanco(erroMysql, resultado) {
+            try {
+                if(erroMysql) throw erroMysql                    
+                resposta.render("produtos/lista", {livros: resultado})                   
+                conexao.end()
+            } catch (erro) {
+                next(erro)
+            }
+        })
 
     })
 
