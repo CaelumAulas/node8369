@@ -3,7 +3,11 @@ const express = require("express")
 // Request listener
 const servidor = express()
 
+
 servidor.set("view engine", "ejs")
+
+servidor.use(express.urlencoded())
+servidor.use(express.json())
 
 require("./routes/home")(servidor)
 require("./routes/produtos")(servidor)
