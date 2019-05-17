@@ -1,16 +1,9 @@
-const mysql = require("mysql")
+const getConnection = require("../db/getConnection")
 
 module.exports = function (servidor) {
-    
     servidor.get("/produtos", function respondeProdutos(request, resposta, next) {
-        const conexao =  mysql.createConnection({
-            host: "localhost",
-            user: "root",
-            password: "",
-            database: "cdc",
-            port: 32769
-        })
-
+        const conexao = getConnection()
+                
         conexao.query("SELECT * FROM livros", function respostaBanco(erroMysql, resultado) {
             try {
                 if(erroMysql) throw erroMysql                    
