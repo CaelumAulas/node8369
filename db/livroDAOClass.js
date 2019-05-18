@@ -6,12 +6,25 @@ module.exports = class Livros {
     }
     
     lista() {
-        const queryPromsificada = Promise.promisify(this.conexao.query).bind(this.conexao)                
-        return queryPromsificada("SELECT * FROM livros")
+        return new Promise((resolve, reject) => {
+            this.conexao.query("SELECT * FROM livros", function(erroMysql, resultado) {
+                try {
+                    if(erroMysql) throw erroMysql
+                    resolve(resultado)
+                } catch(erro) {
+                    reject(erro)
+                }
+            })
+        })
     }
     
     cadastra(livroNovo) {
-        const queryPromsificada = Promise.promisify(this.conexao.query).bind(this.conexao)                
-        return queryPromsificada(`INSERT INTO livros SET ?`, livroNovo)
+        return new Promise((resolve, reject) => {
+            this.conexao.query(`INSERT INTO livros SET ?`, livroNovo, function(erroMysql) {
+                if(erroMysql) reject(erroMysql)
+                resolve()
+            })
+        })
     }
+    
 }
