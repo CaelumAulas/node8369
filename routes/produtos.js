@@ -1,6 +1,6 @@
 const getConnection = require("../db/getConnection")
 
-var Promise = require("bluebird");
+const Livros = require("../db/livroDAOClass")
 
 module.exports = function (servidor) {
     
@@ -8,9 +8,10 @@ module.exports = function (servidor) {
         
         const conexao = getConnection()
 
-        const queryPromsificada = Promise.promisify(conexao.query).bind(conexao)
-                
-        queryPromsificada("SELECT * FROM livros")
+        const livros = new Livros(conexao)
+
+        livros
+            .lista()
             .then(function respostaBanco(resultado) {
 
                 resposta.format({
@@ -60,9 +61,8 @@ module.exports = function (servidor) {
 
         promiseValidacao
             .then(function validacao(){
-                const queryPromsificada = Promise.promisify(conexao.query).bind(conexao)
-                
-                return queryPromsificada(`INSERT INTO livros SET ?`, livroNovo)
+                const livros = new Livros(conexao)
+                return livros.cadastra(livroNovo)
             })
             .then(function query() {
                 resposta.redirect("/produtos")
