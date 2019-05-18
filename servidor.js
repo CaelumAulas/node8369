@@ -1,5 +1,7 @@
 const express = require("express")
 
+const expressValidator = require("express-validator")
+
 // Request listener
 const servidor = express()
 
@@ -8,6 +10,8 @@ servidor.set("view engine", "ejs")
 
 servidor.use(express.urlencoded())
 servidor.use(express.json())
+
+servidor.use(expressValidator())
 
 require("./routes/home")(servidor)
 require("./routes/produtos")(servidor)

@@ -1,20 +1,21 @@
 const getConnection = require("../db/getConnection")
 
+var Promise = require("bluebird");
+
 module.exports = function (servidor) {
     
     servidor.get("/produtos", function respondeProdutos(request, resposta, next) {
         
         const conexao = getConnection()
+
+        const queryPromsificada = Promise.promisify(conexao.query).bind(conexao)
                 
-        conexao.query("SELECT * FROM livros", function respostaBanco(erroMysql, resultado) {
-            try {
-                if(erroMysql) throw erroMysql                    
+        queryPromsificada("SELECT * FROM livros")
+            .then(function respostaBanco(resultado) {
                 resposta.render("produtos/lista", {livros: resultado})                   
                 conexao.end()
-            } catch (erro) {
-                next(erro)
-            }
-        })
+            })
+            .catch(next)
 
     })
 
@@ -47,16 +48,26 @@ module.exports = function (servidor) {
         const conexao = getConnection()
         const livroNovo = request.body
 
-        // Se estiver inválido
-        // resposta.render("produtos/form", { validationErrors: [] })
+        request.assert('titulo', "Nome obrigatório").notEmpty()
+        request.assert('preco', "Preço inválido").isNumeric()
 
-        conexao.query(`INSERT INTO livros SET ?`, livroNovo, function(erroMysql) {
-            try {
-                if(erroMysql) throw erroMysql
+        const promiseValidacao = request.asyncValidationErrors()
+
+        promiseValidacao
+            .then(function validacao(){
+                const queryPromsificada = Promise.promisify(conexao.query).bind(conexao)
+                
+                return queryPromsificada(`INSERT INTO livros SET ?`, livroNovo)
+            })
+            .then(function query() {
                 resposta.redirect("/produtos")
-            } catch (erro) {
+            })
+            .catch(function(erro) {
                 next(erro)
-            }
+            })
+            
+        promiseValidacao.catch(function erroValidacao(validationErrors) {
+            resposta.render("produtos/form", { validationErrors })
         })
     })
 }
