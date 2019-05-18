@@ -12,11 +12,16 @@ module.exports = function (servidor) {
                 
         queryPromsificada("SELECT * FROM livros")
             .then(function respostaBanco(resultado) {
-                resposta.render("produtos/lista", {livros: resultado})                   
+
+                resposta.format({
+                    html: () => resposta.render("produtos/lista", {livros: resultado})
+                    ,json: () => resposta.send(resultado)
+                    ,default: () => next(new Error("Formato não suportado"))
+                })
+                
                 conexao.end()
             })
             .catch(next)
-
     })
 
     servidor.get("/produtos/form", function(req, res){
