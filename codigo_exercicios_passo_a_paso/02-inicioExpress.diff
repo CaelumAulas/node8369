@@ -1,0 +1,90 @@
+diff --git a/package.json b/package.json
+new file mode 100644
+index 0000000..29670f5
+--- /dev/null
++++ b/package.json
+@@ -0,0 +1,5 @@
++{
++  "dependencies": {
++    "express": "^4.16.4"
++  }
++}
+diff --git a/produtos.html b/produtos.html
+new file mode 100644
+index 0000000..9ae9583
+--- /dev/null
++++ b/produtos.html
+@@ -0,0 +1 @@
++<h1>Produtos</h1>
+\ No newline at end of file
+diff --git a/servidor.js b/servidor.js
+index 77e798f..4b70faf 100644
+--- a/servidor.js
++++ b/servidor.js
+@@ -1,22 +1,23 @@
+-const http = require("http")
++const express = require("express")
+ 
+ // Request listener
+-const servidor = http.createServer(function responde(request, resposta) {
+-    if(request.url == "/produtos"){
+-        resposta.end("Produtos")
+-    }
+-    else if(request.url == "/") {
+-        resposta.end("Home")
+-    }
++const servidor = express()
+ 
+-    resposta.end("404")
++const porta = process.env.PORTA || 3000
++
++servidor.get("/", function respondeHome(request, resposta) {
++    resposta.end("Home")
++})
++
++servidor.get("/produtos", function respondeProdutos(request, resposta) {
++    resposta.end("Produtos")
+ })
+ 
+ // Assíncrono
+ // Listener
+ // Função de callback
+ // Handler
+-servidor.listen(3000, function(){
+-    console.log("Servidor rodando na porta " + servidor.address().port)
++// Função anônima
++servidor.listen(porta, function(){
++    console.log("Servidor rodando na porta " + porta)
+ })
+-
+diff --git a/servidorAntigo.js b/servidorAntigo.js
+new file mode 100644
+index 0000000..51225ad
+--- /dev/null
++++ b/servidorAntigo.js
+@@ -0,0 +1,25 @@
++const http = require("http")
++
++// Request listener
++const servidor = http.createServer(function responde(request, resposta) {
++    if(request.url == "/produtos" && request.method){
++        resposta.writeHead(200, {
++            "Content-Type": "text/html"
++        })
++        resposta.end("Produtos")
++    }
++    else if(request.url == "/") {
++        resposta.end("Home")
++    }
++
++    resposta.end("404")
++})
++
++// Assíncrono
++// Listener
++// Função de callback
++// Handler
++servidor.listen(3000, function(){
++    console.log("Servidor rodando na porta " + servidor.address().port)
++})
++

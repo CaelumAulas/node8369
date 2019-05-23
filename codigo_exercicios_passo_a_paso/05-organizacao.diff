@@ -1,0 +1,44 @@
+diff --git a/main.js b/main.js
+new file mode 100644
+index 0000000..5547f03
+--- /dev/null
++++ b/main.js
+@@ -0,0 +1,12 @@
++const servidor = require('./servidor')
++
++const porta = process.env.PORTA || 3000
++
++// Assíncrono
++// Listener
++// Função de callback
++// Handler
++// Função anônima
++servidor.listen(porta, function(){
++    console.log("Servidor rodando na porta " + porta)
++})
+diff --git a/servidor.js b/servidor.js
+index 1a17542..e6f2c01 100644
+--- a/servidor.js
++++ b/servidor.js
+@@ -3,8 +3,6 @@ const express = require("express")
+ // Request listener
+ const servidor = express()
+ 
+-const porta = process.env.PORTA || 3000
+-
+ servidor.get("/", function respondeHome(request, resposta) {
+     resposta.render("home/home.ejs")
+ })
+@@ -34,11 +32,4 @@ servidor.use(function responde404(request, resposta) {
+         .render("erros/erro.ejs", {erro: "404 - Página não encontrada"})
+ })
+ 
+-// Assíncrono
+-// Listener
+-// Função de callback
+-// Handler
+-// Função anônima
+-servidor.listen(porta, function(){
+-    console.log("Servidor rodando na porta " + porta)
+-})
++module.exports = servidor

@@ -1,0 +1,53 @@
+diff --git a/routes/produtos.js b/routes/produtos.js
+index 2aa5f0c..38bf239 100644
+--- a/routes/produtos.js
++++ b/routes/produtos.js
+@@ -12,11 +12,16 @@ module.exports = function (servidor) {
+                 
+         queryPromsificada("SELECT * FROM livros")
+             .then(function respostaBanco(resultado) {
+-                resposta.render("produtos/lista", {livros: resultado})                   
++
++                resposta.format({
++                    html: () => resposta.render("produtos/lista", {livros: resultado})
++                    ,json: () => resposta.send(resultado)
++                    ,default: () => next(new Error("Formato não suportado"))
++                })
++                
+                 conexao.end()
+             })
+             .catch(next)
+-
+     })
+ 
+     servidor.get("/produtos/form", function(req, res){
+diff --git a/servidor.js b/servidor.js
+index f11c7d1..9ae13cb 100644
+--- a/servidor.js
++++ b/servidor.js
+@@ -19,17 +19,19 @@ require("./routes/produtos")(servidor)
+ servidor.use(express.static('./static'))
+ 
+ servidor.use(function responde404(request, resposta, next) {
+-    resposta
+-        .status(404)
+-        .render("erros/erro", {erro: "404 - Página não encontrada"})
++    resposta.status(404).format({
++        html: () =>  resposta.render("erros/erro", {erro: "404 - Página não encontrada"})
++        ,json: () => resposta.send({erro: "404 - Página não encontrada"})
++    })
+ })
+ 
+ servidor.use(function trataErro(erro, request, resposta, next){
+     console.error("Endereço: " + request.url)
+     console.error(erro)
+-    resposta
+-        .status(500)
+-        .render("erros/erro", { erro })
++    resposta.status(500).format({
++        html: () =>  resposta.render("erros/erro", { erro })
++        ,json: () => resposta.send(erro)
++    })
+ })
+ 
+ module.exports = servidor

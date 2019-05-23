@@ -1,0 +1,39 @@
+diff --git a/package.json b/package.json
+index b44aaa5..0c4ed28 100644
+--- a/package.json
++++ b/package.json
+@@ -1,6 +1,33 @@
+ {
++  "name": "node8369",
++  "version": "1.0.0",
++  "description": "Aula JS-35 turma node8369",
++  "main": "main.js",
+   "dependencies": {
+     "ejs": "^2.6.1",
+     "express": "^4.16.4"
+-  }
++  },
++  "devDependencies": {
++    "nodemon": "^1.19.0"
++  },
++  "scripts": {
++    "start": "node main.js",
++    "start-dev": "nodemon main.js",
++    "test": "echo \"Error: no test specified\" && exit 1"
++  },
++  "repository": {
++    "type": "git",
++    "url": "git+https://github.com/CaelumAulas/node8369.git"
++  },
++  "keywords": [
++    "caelum",
++    "aula",
++    "js35"
++  ],
++  "author": "Caelum Turma 8369",
++  "license": "ISC",
++  "bugs": {
++    "url": "https://github.com/CaelumAulas/node8369/issues"
++  },
++  "homepage": "https://github.com/CaelumAulas/node8369#readme"
+ }

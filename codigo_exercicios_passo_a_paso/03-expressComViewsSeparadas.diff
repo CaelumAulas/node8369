@@ -1,0 +1,56 @@
+diff --git a/package.json b/package.json
+index 29670f5..b44aaa5 100644
+--- a/package.json
++++ b/package.json
+@@ -1,5 +1,6 @@
+ {
+   "dependencies": {
++    "ejs": "^2.6.1",
+     "express": "^4.16.4"
+   }
+ }
+diff --git a/produtos.html b/produtos.html
+deleted file mode 100644
+index 9ae9583..0000000
+--- a/produtos.html
++++ /dev/null
+@@ -1 +0,0 @@
+-<h1>Produtos</h1>
+\ No newline at end of file
+diff --git a/servidor.js b/servidor.js
+index 4b70faf..f629ca2 100644
+--- a/servidor.js
++++ b/servidor.js
+@@ -6,11 +6,24 @@ const servidor = express()
+ const porta = process.env.PORTA || 3000
+ 
+ servidor.get("/", function respondeHome(request, resposta) {
+-    resposta.end("Home")
++    resposta.render("home/home.ejs")
+ })
+ 
+ servidor.get("/produtos", function respondeProdutos(request, resposta) {
+-    resposta.end("Produtos")
++    const listaDoBanco = [
++        {
++            titulo: "Android"
++            ,preco: 50
++            ,descricao: "Livro teste"
++        }
++        ,        {
++            titulo: "Node"
++            ,preco: 33
++            ,descricao: "Livro teste"
++        }
++    ]
++
++    resposta.render("produtos/lista.ejs", {livros: listaDoBanco})
+ })
+ 
+ // Assíncrono
+
+diff --fluxo arquivos_curso_add_or_remove
+A	views/home/home.ejs
+A	views/includes/footer.ejs
+A	views/includes/header.ejs
+A	views/produtos/lista.ejs

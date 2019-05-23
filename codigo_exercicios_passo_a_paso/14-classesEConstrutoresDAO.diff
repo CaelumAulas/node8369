@@ -1,0 +1,116 @@
+diff --git a/db/livroDAO.js b/db/livroDAO.js
+new file mode 100644
+index 0000000..41a6f70
+--- /dev/null
++++ b/db/livroDAO.js
+@@ -0,0 +1,20 @@
++var Promise = require("bluebird");
++
++function listalivros(conexao) {
++    const queryPromsificada = Promise.promisify(conexao.query).bind(conexao)                
++    return queryPromsificada("SELECT * FROM livros")
++}
++
++function cadastraLivro(conexao, livroNovo) {
++    const queryPromsificada = Promise.promisify(conexao.query).bind(conexao)                
++    return queryPromsificada(`INSERT INTO livros SET ?`, livroNovo)
++}
++
++// função construtora
++// classe
++module.exports = function Livros(conexao) {
++    return {
++        lista: () => listalivros(conexao)
++        ,cadastra: (livroNovo) => cadastraLivro(conexao, livroNovo)
++    }
++}
+\ No newline at end of file
+diff --git a/db/livroDAOClass.js b/db/livroDAOClass.js
+new file mode 100644
+index 0000000..644d758
+--- /dev/null
++++ b/db/livroDAOClass.js
+@@ -0,0 +1,17 @@
++var Promise = require("bluebird");
++
++module.exports = class Livros {
++    constructor(conexao) {
++        this.conexao = conexao
++    }
++    
++    lista() {
++        const queryPromsificada = Promise.promisify(this.conexao.query).bind(this.conexao)                
++        return queryPromsificada("SELECT * FROM livros")
++    }
++    
++    cadastra(livroNovo) {
++        const queryPromsificada = Promise.promisify(this.conexao.query).bind(this.conexao)                
++        return queryPromsificada(`INSERT INTO livros SET ?`, livroNovo)
++    }
++}
+diff --git a/db/livroDAOPrototype.js b/db/livroDAOPrototype.js
+new file mode 100644
+index 0000000..a3a99c6
+--- /dev/null
++++ b/db/livroDAOPrototype.js
+@@ -0,0 +1,21 @@
++var Promise = require("bluebird");
++
++function Livros(conexao) {
++    // const this = {}
++    this.conexao = conexao
++    // retuurn this
++}
++
++Livros.prototype.lista = function listalivros() {
++    const queryPromsificada = Promise.promisify(this.conexao.query).bind(this.conexao)                
++    return queryPromsificada("SELECT * FROM livros")
++}
++
++Livros.prototype.cadastra = function cadastraLivro(livroNovo) {
++    const queryPromsificada = Promise.promisify(this.conexao.query).bind(this.conexao)                
++    return queryPromsificada(`INSERT INTO livros SET ?`, livroNovo)
++}
++
++// função construtora
++// classe
++module.exports = Livros
+\ No newline at end of file
+diff --git a/routes/produtos.js b/routes/produtos.js
+index 38bf239..5eafc0c 100644
+--- a/routes/produtos.js
++++ b/routes/produtos.js
+@@ -1,6 +1,6 @@
+ const getConnection = require("../db/getConnection")
+ 
+-var Promise = require("bluebird");
++const Livros = require("../db/livroDAOClass")
+ 
+ module.exports = function (servidor) {
+     
+@@ -8,9 +8,10 @@ module.exports = function (servidor) {
+         
+         const conexao = getConnection()
+ 
+-        const queryPromsificada = Promise.promisify(conexao.query).bind(conexao)
+-                
+-        queryPromsificada("SELECT * FROM livros")
++        const livros = new Livros(conexao)
++
++        livros
++            .lista()
+             .then(function respostaBanco(resultado) {
+ 
+                 resposta.format({
+@@ -60,9 +61,8 @@ module.exports = function (servidor) {
+ 
+         promiseValidacao
+             .then(function validacao(){
+-                const queryPromsificada = Promise.promisify(conexao.query).bind(conexao)
+-                
+-                return queryPromsificada(`INSERT INTO livros SET ?`, livroNovo)
++                const livros = new Livros(conexao)
++                return livros.cadastra(livroNovo)
+             })
+             .then(function query() {
+                 resposta.redirect("/produtos")

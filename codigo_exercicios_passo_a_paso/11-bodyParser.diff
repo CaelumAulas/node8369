@@ -1,0 +1,88 @@
+diff --git a/package.json b/package.json
+index c5e1bda..fa9e7bd 100644
+--- a/package.json
++++ b/package.json
+@@ -6,7 +6,8 @@
+   "dependencies": {
+     "ejs": "^2.6.1",
+     "express": "^4.16.4",
+-    "mysql": "^2.17.1"
++    "mysql": "^2.17.1",
++    "query-string": "^6.5.0"
+   },
+   "devDependencies": {
+     "nodemon": "^1.19.0"
+diff --git a/routes/produtos.js b/routes/produtos.js
+index 2773f72..134f628 100644
+--- a/routes/produtos.js
++++ b/routes/produtos.js
+@@ -1,7 +1,9 @@
+ const getConnection = require("../db/getConnection")
+ 
+ module.exports = function (servidor) {
++    
+     servidor.get("/produtos", function respondeProdutos(request, resposta, next) {
++        
+         const conexao = getConnection()
+                 
+         conexao.query("SELECT * FROM livros", function respostaBanco(erroMysql, resultado) {
+@@ -19,4 +21,42 @@ module.exports = function (servidor) {
+     servidor.get("/produtos/form", function(req, res){
+         res.render("produtos/form", { validationErrors: [] })
+     })
++
++    // servidor.post("/produtos", function montaBody(request, resposta, next) {
++    //     const queryString = require('query-string');
++
++    //     request.body = ''
++    //     request.on("data", function trataChunk(chunk) {
++    //         request.body += chunk
++    //     })
++
++    //     request.on("end", function() {
++    //         if(request.header("Content-Type") == "application/json") {
++    //             request.body = JSON.parse(request.body)
++    //         } else {
++    //             request.body = queryString.parse(request.body)
++    //         }
++    //         next()
++    //     })
++    // })
++
++    // servidor.post("/produtos", bodyParser.urlencoded())
++    // servidor.post("/produtos", bodyParser.json())
++
++    servidor.post("/produtos", function(request, resposta, next) {
++        const conexao = getConnection()
++        const livroNovo = request.body
++
++        // Se estiver inválido
++        // resposta.render("produtos/form", { validationErrors: [] })
++
++        conexao.query(`INSERT INTO livros SET ?`, livroNovo, function(erroMysql) {
++            try {
++                if(erroMysql) throw erroMysql
++                resposta.redirect("/produtos")
++            } catch (erro) {
++                next(erro)
++            }
++        })
++    })
+ }
+diff --git a/servidor.js b/servidor.js
+index e891cd0..63407a3 100644
+--- a/servidor.js
++++ b/servidor.js
+@@ -3,8 +3,12 @@ const express = require("express")
+ // Request listener
+ const servidor = express()
+ 
++
+ servidor.set("view engine", "ejs")
+ 
++servidor.use(express.urlencoded())
++servidor.use(express.json())
++
+ require("./routes/home")(servidor)
+ require("./routes/produtos")(servidor)
+ 

@@ -1,0 +1,28 @@
+diff --git a/servidor.js b/servidor.js
+new file mode 100644
+index 0000000..77e798f
+--- /dev/null
++++ b/servidor.js
+@@ -0,0 +1,22 @@
++const http = require("http")
++
++// Request listener
++const servidor = http.createServer(function responde(request, resposta) {
++    if(request.url == "/produtos"){
++        resposta.end("Produtos")
++    }
++    else if(request.url == "/") {
++        resposta.end("Home")
++    }
++
++    resposta.end("404")
++})
++
++// Assíncrono
++// Listener
++// Função de callback
++// Handler
++servidor.listen(3000, function(){
++    console.log("Servidor rodando na porta " + servidor.address().port)
++})
++

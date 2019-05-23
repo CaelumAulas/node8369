@@ -1,0 +1,63 @@
+diff --git a/routes/produtos.js b/routes/produtos.js
+index 0728ce8..4427496 100644
+--- a/routes/produtos.js
++++ b/routes/produtos.js
+@@ -1,22 +1,25 @@
+ const mysql = require("mysql")
+ 
+ module.exports = function (servidor) {
+-    servidor.get("/produtos", function respondeProdutos(request, resposta) {
+     
++    servidor.get("/produtos", function respondeProdutos(request, resposta, next) {
+         const conexao =  mysql.createConnection({
+-            host: "tcp://0.tcp.ngrok.io",
++            host: "localhost",
+             user: "root",
+             password: "",
+             database: "cdc",
+-            port: 18195
++            port: 32769
+         })
+ 
+-       conexao.query("SELECT * FROM livros", function respostaBanco(erro, resultado) {
+-        console.log(resultado)
+-        resposta.render("produtos/lista", {livros: resultado})
+-        
+-        conexao.end()
+-       })
++        conexao.query("SELECT * FROM livros", function respostaBanco(erroMysql, resultado) {
++            try {
++                if(erroMysql) throw erroMysql                    
++                resposta.render("produtos/lista", {livros: resultado})                   
++                conexao.end()
++            } catch (erro) {
++                next(erro)
++            }
++        })
+ 
+     })
+ 
+diff --git a/servidor.js b/servidor.js
+index ccdca0f..e891cd0 100644
+--- a/servidor.js
++++ b/servidor.js
+@@ -10,10 +10,18 @@ require("./routes/produtos")(servidor)
+ 
+ servidor.use(express.static('./static'))
+ 
+-servidor.use(function responde404(request, resposta) {
++servidor.use(function responde404(request, resposta, next) {
+     resposta
+         .status(404)
+         .render("erros/erro", {erro: "404 - Página não encontrada"})
+ })
+ 
++servidor.use(function trataErro(erro, request, resposta, next){
++    console.error("Endereço: " + request.url)
++    console.error(erro)
++    resposta
++        .status(500)
++        .render("erros/erro", { erro })
++})
++
+ module.exports = servidor

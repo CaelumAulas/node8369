@@ -1,0 +1,103 @@
+diff --git a/package.json b/package.json
+index fa9e7bd..ef34aa6 100644
+--- a/package.json
++++ b/package.json
+@@ -4,8 +4,10 @@
+   "description": "Aula JS-35 turma node8369",
+   "main": "main.js",
+   "dependencies": {
++    "bluebird": "^3.5.4",
+     "ejs": "^2.6.1",
+     "express": "^4.16.4",
++    "express-validator": "^5.3.1",
+     "mysql": "^2.17.1",
+     "query-string": "^6.5.0"
+   },
+diff --git a/routes/produtos.js b/routes/produtos.js
+index 134f628..2aa5f0c 100644
+--- a/routes/produtos.js
++++ b/routes/produtos.js
+@@ -1,20 +1,21 @@
+ const getConnection = require("../db/getConnection")
+ 
++var Promise = require("bluebird");
++
+ module.exports = function (servidor) {
+     
+     servidor.get("/produtos", function respondeProdutos(request, resposta, next) {
+         
+         const conexao = getConnection()
++
++        const queryPromsificada = Promise.promisify(conexao.query).bind(conexao)
+                 
+-        conexao.query("SELECT * FROM livros", function respostaBanco(erroMysql, resultado) {
+-            try {
+-                if(erroMysql) throw erroMysql                    
++        queryPromsificada("SELECT * FROM livros")
++            .then(function respostaBanco(resultado) {
+                 resposta.render("produtos/lista", {livros: resultado})                   
+                 conexao.end()
+-            } catch (erro) {
+-                next(erro)
+-            }
+-        })
++            })
++            .catch(next)
+ 
+     })
+ 
+@@ -47,16 +48,26 @@ module.exports = function (servidor) {
+         const conexao = getConnection()
+         const livroNovo = request.body
+ 
+-        // Se estiver inválido
+-        // resposta.render("produtos/form", { validationErrors: [] })
++        request.assert('titulo', "Nome obrigatório").notEmpty()
++        request.assert('preco', "Preço inválido").isNumeric()
++
++        const promiseValidacao = request.asyncValidationErrors()
+ 
+-        conexao.query(`INSERT INTO livros SET ?`, livroNovo, function(erroMysql) {
+-            try {
+-                if(erroMysql) throw erroMysql
++        promiseValidacao
++            .then(function validacao(){
++                const queryPromsificada = Promise.promisify(conexao.query).bind(conexao)
++                
++                return queryPromsificada(`INSERT INTO livros SET ?`, livroNovo)
++            })
++            .then(function query() {
+                 resposta.redirect("/produtos")
+-            } catch (erro) {
++            })
++            .catch(function(erro) {
+                 next(erro)
+-            }
++            })
++            
++        promiseValidacao.catch(function erroValidacao(validationErrors) {
++            resposta.render("produtos/form", { validationErrors })
+         })
+     })
+ }
+diff --git a/servidor.js b/servidor.js
+index 63407a3..f11c7d1 100644
+--- a/servidor.js
++++ b/servidor.js
+@@ -1,5 +1,7 @@
+ const express = require("express")
+ 
++const expressValidator = require("express-validator")
++
+ // Request listener
+ const servidor = express()
+ 
+@@ -9,6 +11,8 @@ servidor.set("view engine", "ejs")
+ servidor.use(express.urlencoded())
+ servidor.use(express.json())
+ 
++servidor.use(expressValidator())
++
+ require("./routes/home")(servidor)
+ require("./routes/produtos")(servidor)
+ 

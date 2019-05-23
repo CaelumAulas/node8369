@@ -1,0 +1,41 @@
+diff --git a/db/getConnection.js b/db/getConnection.js
+new file mode 100644
+index 0000000..e6a2a18
+--- /dev/null
++++ b/db/getConnection.js
+@@ -0,0 +1,11 @@
++const mysql = require("mysql")
++
++module.exports = function getConnection() {
++    return mysql.createPool({
++        host: "localhost",
++        user: "root",
++        password: "",
++        database: "cdc",
++        port: 32769 
++    })
++}
+diff --git a/routes/produtos.js b/routes/produtos.js
+index 4427496..2773f72 100644
+--- a/routes/produtos.js
++++ b/routes/produtos.js
+@@ -1,16 +1,9 @@
+-const mysql = require("mysql")
++const getConnection = require("../db/getConnection")
+ 
+ module.exports = function (servidor) {
+-    
+     servidor.get("/produtos", function respondeProdutos(request, resposta, next) {
+-        const conexao =  mysql.createConnection({
+-            host: "localhost",
+-            user: "root",
+-            password: "",
+-            database: "cdc",
+-            port: 32769
+-        })
+-
++        const conexao = getConnection()
++                
+         conexao.query("SELECT * FROM livros", function respostaBanco(erroMysql, resultado) {
+             try {
+                 if(erroMysql) throw erroMysql                    

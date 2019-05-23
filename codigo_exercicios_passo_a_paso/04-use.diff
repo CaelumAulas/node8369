@@ -1,0 +1,38 @@
+diff --git a/servidor.js b/servidor.js
+index f629ca2..1a17542 100644
+--- a/servidor.js
++++ b/servidor.js
+@@ -26,6 +26,14 @@ servidor.get("/produtos", function respondeProdutos(request, resposta) {
+     resposta.render("produtos/lista.ejs", {livros: listaDoBanco})
+ })
+ 
++servidor.use(express.static('./static'))
++
++servidor.use(function responde404(request, resposta) {
++    resposta
++        .status(404)
++        .render("erros/erro.ejs", {erro: "404 - Página não encontrada"})
++})
++
+ // Assíncrono
+ // Listener
+ // Função de callback
+
+diff --fluxo arquivos_curso_add_or_remove
+A	static/css/bootstrap-theme.css
+A	static/css/bootstrap-theme.css.map
+A	static/css/bootstrap-theme.min.css
+A	static/css/bootstrap-theme.min.css.map
+A	static/css/bootstrap.css
+A	static/css/bootstrap.css.map
+A	static/css/bootstrap.min.css
+A	static/css/bootstrap.min.css.map
+A	static/fonts/glyphicons-halflings-regular.eot
+A	static/fonts/glyphicons-halflings-regular.svg
+A	static/fonts/glyphicons-halflings-regular.ttf
+A	static/fonts/glyphicons-halflings-regular.woff
+A	static/fonts/glyphicons-halflings-regular.woff2
+A	static/js/bootstrap.js
+A	static/js/bootstrap.min.js
+A	static/js/npm.js
+A	views/erros/erro.ejs

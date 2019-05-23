@@ -1,0 +1,55 @@
+diff --git a/package.json b/package.json
+index 0c4ed28..c5e1bda 100644
+--- a/package.json
++++ b/package.json
+@@ -5,7 +5,8 @@
+   "main": "main.js",
+   "dependencies": {
+     "ejs": "^2.6.1",
+-    "express": "^4.16.4"
++    "express": "^4.16.4",
++    "mysql": "^2.17.1"
+   },
+   "devDependencies": {
+     "nodemon": "^1.19.0"
+diff --git a/routes/produtos.js b/routes/produtos.js
+index f25dbaa..0728ce8 100644
+--- a/routes/produtos.js
++++ b/routes/produtos.js
+@@ -1,19 +1,23 @@
++const mysql = require("mysql")
++
+ module.exports = function (servidor) {
+     servidor.get("/produtos", function respondeProdutos(request, resposta) {
+-        const listaDoBanco = [
+-            {
+-                titulo: "Android"
+-                ,preco: 50
+-                ,descricao: "Livro teste"
+-            }
+-            ,        {
+-                titulo: "Node"
+-                ,preco: 33
+-                ,descricao: "Livro teste"
+-            }
+-        ]
++    
++        const conexao =  mysql.createConnection({
++            host: "tcp://0.tcp.ngrok.io",
++            user: "root",
++            password: "",
++            database: "cdc",
++            port: 18195
++        })
++
++       conexao.query("SELECT * FROM livros", function respostaBanco(erro, resultado) {
++        console.log(resultado)
++        resposta.render("produtos/lista", {livros: resultado})
++        
++        conexao.end()
++       })
+ 
+-        resposta.render("produtos/lista", {livros: listaDoBanco})
+     })
+ 
+     servidor.get("/produtos/form", function(req, res){
